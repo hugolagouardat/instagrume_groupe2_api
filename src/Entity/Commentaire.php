@@ -40,8 +40,10 @@ class Commentaire
     #[ORM\JoinColumn(onDelete: "CASCADE")]
     private Collection $likesCommentaires;
 
-    #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]
+
+    #[ORM\OneToOne(targetEntity: Commentaire::class, mappedBy: 'commentaire', cascade: ['persist', 'remove'])]
     private ?self $commentaire = null;
+
 
     public function __construct()
     {
