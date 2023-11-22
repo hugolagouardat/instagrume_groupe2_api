@@ -37,6 +37,7 @@ class Commentaire
     private ?Photo $photo = null;
 
     #[ORM\OneToMany(mappedBy: 'commentaire', targetEntity: LikesCommentaire::class)]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
     private Collection $likesCommentaires;
 
     #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]

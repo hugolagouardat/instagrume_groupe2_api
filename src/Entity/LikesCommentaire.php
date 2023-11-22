@@ -18,10 +18,12 @@ class LikesCommentaire
 
     #[ORM\ManyToOne(inversedBy: 'likesCommentaires')]
     #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'likesCommentaires')]
     #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?Commentaire $commentaire = null;
 
     public function getId(): ?int
