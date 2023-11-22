@@ -85,23 +85,22 @@ class UserController extends AbstractController {
 
         return new Response($this->jsonConverter->encodeToJson($user));
     }
-
-    #[Route('/api/users', methods: ['GET'])]
-    #[OA\Get(description: 'Retourne la liste de tous les utilisateurs')]
-    #[OA\Response(
-        response: 200,
-        description: 'La liste de tous les utilisateurs',
-        content: new OA\JsonContent(
-            type: 'array',
-            items: new OA\Items(ref: new Model(type: User::class))
-        )
-    )]
-    #[OA\Tag(name: 'utilisateurs')]
-    public function getAllUsers(ManagerRegistry $doctrine) {
-
+    #[Route('/api/users/search', methods: ['GET'])]
+    public function searchUser(Request $request, ManagerRegistry $doctrine, JsonConverter $jsonConverter): JsonResponse
+    {
+        $username = $request->query->get('username');
+    
+        if (!$username) {
+            return new JsonResponse(['message' => 'Le nom d\'utilisateur est requis'], Response::HTTP_BAD_REQUEST);
+        }
+    
         $entityManager = $doctrine->getManager();
-
-        $users = $entityManager->getRepository(User::class)->findAll();
-        return new Response($this->jsonConverter->encodeToJson($users));
+        $users = $entityManager->getRepository(User::class)->findBy(['username' => $username]);
+    
+        // Utilisation de JsonConverter pour sérialiser les entités en JSON
+        $jsonContent = $jsonConverter->encodeToJson($users);
+    
+        return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
     }
+   
 }
