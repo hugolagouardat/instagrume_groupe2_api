@@ -85,22 +85,126 @@ class UserController extends AbstractController {
 
         return new Response($this->jsonConverter->encodeToJson($user));
     }
-    #[Route('/api/users/search', methods: ['GET'])]
-    public function searchUser(Request $request, ManagerRegistry $doctrine, JsonConverter $jsonConverter): JsonResponse
-    {
-        $username = $request->query->get('username');
-    
-        if (!$username) {
-            return new JsonResponse(['message' => 'Le nom d\'utilisateur est requis'], Response::HTTP_BAD_REQUEST);
-        }
-    
-        $entityManager = $doctrine->getManager();
-        $users = $entityManager->getRepository(User::class)->findBy(['username' => $username]);
-    
-        // Utilisation de JsonConverter pour sérialiser les entités en JSON
-        $jsonContent = $jsonConverter->encodeToJson($users);
-    
-        return new JsonResponse($jsonContent, Response::HTTP_OK, [], true);
+
+
+
+
+    #[Route('/api/newuser', methods: ['POST'])]
+    #[OA\Post(description: 'Crée un nouvel utilisateur')]
+	#[OA\Response(
+		response: 200,
+		description: 'La nouvelle utilisateur créée',
+        content: new OA\JsonContent(ref: new Model(type: User::class))
+	)]
+	#[OA\RequestBody(
+		required: true,
+		content: new OA\JsonContent(
+			type: 'object',
+			properties: [
+                new OA\Property(property: 'username', type: 'string'),
+				new OA\Property(property: 'password', type: 'string'),
+                new OA\Property(property: 'avatar', type: 'string'),
+                new OA\Property(property: 'description', type: 'string'),
+                
+			]
+		)
+	)]
+	#[OA\Tag(name: 'utilisateurs')]
+	public function createUser(ManagerRegistry $doctrine) {
+		$entityManager = $doctrine->getManager();
+        $request = Request::createFromGlobals();
+        $data = json_decode($request->getContent(), true);
+       
+        $user = new User();
+        $user->setUsername($data['username']);
+        $user->setRoles(['ROLE_USER']);
+        $user->setBan(0);
+        $user->setPassword($this->passwordHasher->hashPassword($user,  $data['password']));
+        $user->setAvatar($data['avatar']);
+        $user->setDescription($data['description']);
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new Response($this->jsonConverter->encodeToJson($user));
     }
-   
+
+
+
+
+
+    // erreur inconu voir la doc
+
+    
+    #[Route('/api/updateuser', methods: ['PUT'])]
+    #[OA\Put(description: 'Update un nouvel utilisateur')]
+	#[OA\Response(
+		response: 200,
+		description: "L'utilisateur a ete modifier",
+        content: new OA\JsonContent(ref: new Model(type: User::class))
+	)]
+	#[OA\RequestBody(
+		required: true,
+		content: new OA\JsonContent(
+			type: 'object',
+			properties: [
+                new OA\Property(property: 'id', type: 'number'),
+				new OA\Property(property: 'password', type: 'string'),
+                new OA\Property(property: 'avatar', type: 'string'),
+                new OA\Property(property: 'description', type: 'string'),
+			]
+		)
+	)]
+	#[OA\Tag(name: 'utilisateurs')]
+	public function updateUser(ManagerRegistry $doctrine) {
+		$entityManager = $doctrine->getManager();
+        $request = Request::createFromGlobals();
+        $data = json_decode($request->getContent(), true);
+        $user = $doctrine->getRepository(User::class)->find($data['id']);
+        if (!$user) {
+            throw $this->createNotFoundException(
+                "Pas d'utilisateur"
+            );
+        }
+        $user->setPassword($this->passwordHasher->hashPassword($user,  $data['password']));
+        $user->setAvatar($data['avatar']);
+        $user->setDescription($data['description']);
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new Response($this->jsonConverter->encodeToJson($user));
+    }
+
+
+
+
+    //pas d'erreur mais ne trouve pas l'user
+
+    #[Route('/api/users/search/{username}', methods: ['GET'])]
+    #[OA\Get(description: 'Retourne le profil de l\'utilisateur rechercher')]
+	#[OA\Response(
+		response: 200,
+		description: 'Le profil d\'un user',
+        content: new OA\JsonContent(ref: new Model(type: User::class))
+	)]
+	#[OA\Parameter(
+		name: 'username',
+		in: 'path',
+		schema: new OA\Schema(type: 'string'),
+		required: true,
+		description: 'Le nom d\'un utilisateur'
+	)]
+	#[OA\Tag(name: 'utilisateurs')]
+	public function getUserByName(ManagerRegistry $doctrine, $username) {
+		$entityManager = $doctrine->getManager();
+       
+        $user = $entityManager->getRepository(user::class)->find($username);
+        $entityManager->flush();
+
+        return new Response($this->jsonConverter->encodeToJson($user));
+    }
+
+
+    
+
 }
