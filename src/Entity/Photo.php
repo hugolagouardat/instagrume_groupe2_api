@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PhotoRepository::class)]
 class Photo
@@ -34,21 +35,17 @@ class Photo
     #[ORM\Column]
     private ?bool $is_locked = null;
 
-    #[ORM\OneToMany(mappedBy: 'photo', targetEntity: LikesPhoto::class)]
-    private Collection $likesPhotos;
-
-    #[ORM\ManyToOne(inversedBy: 'photos')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'photo', targetEntity: User::class)]
     private ?User $user = null;
 
-    #[ORM\OneToMany(mappedBy: 'photo', targetEntity: Commentaire::class)]
-    private Collection $commentaires;
+    #[ORM\OneToMany(mappedBy: 'photo', targetEntity: LikesPhoto::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private $likesPhoto;
 
-    public function __construct()
-    {
-        $this->likesPhotos = new ArrayCollection();
-        $this->commentaires = new ArrayCollection();
-    }
+    #[ORM\OneToMany(mappedBy: 'photo', targetEntity: Commentaire::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private $commentaire;
+    
 
     public function getId(): ?int
     {
@@ -127,32 +124,26 @@ class Photo
         return $this;
     }
 
-    /**
-     * @return Collection<int, LikesPhoto>
-     */
-    public function getLikesPhotos(): Collection
+    public function getCommentaire()
     {
-        return $this->likesPhotos;
+        return $this->commentaire;
     }
 
-    public function addLikesPhoto(LikesPhoto $likesPhoto): static
+    public function setCommentaire($commentaire)
     {
-        if (!$this->likesPhotos->contains($likesPhoto)) {
-            $this->likesPhotos->add($likesPhoto);
-            $likesPhoto->setPhoto($this);
-        }
+        $this->commentaire = $commentaire;
 
         return $this;
     }
 
-    public function removeLikesPhoto(LikesPhoto $likesPhoto): static
+    public function getLikesPhoto()
     {
-        if ($this->likesPhotos->removeElement($likesPhoto)) {
-            // set the owning side to null (unless already changed)
-            if ($likesPhoto->getPhoto() === $this) {
-                $likesPhoto->setPhoto(null);
-            }
-        }
+        return $this->likesPhoto;
+    }
+
+    public function setLikesPhoto($likesPhoto)
+    {
+        $this->likesPhoto = $likesPhoto;
 
         return $this;
     }
@@ -169,33 +160,4 @@ class Photo
         return $this;
     }
 
-    /**
-     * @return Collection<int, Commentaire>
-     */
-    public function getCommentaires(): Collection
-    {
-        return $this->commentaires;
-    }
-
-    public function addCommentaire(Commentaire $commentaire): static
-    {
-        if (!$this->commentaires->contains($commentaire)) {
-            $this->commentaires->add($commentaire);
-            $commentaire->setPhoto($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCommentaire(Commentaire $commentaire): static
-    {
-        if ($this->commentaires->removeElement($commentaire)) {
-            // set the owning side to null (unless already changed)
-            if ($commentaire->getPhoto() === $this) {
-                $commentaire->setPhoto(null);
-            }
-        }
-
-        return $this;
-    }
 }

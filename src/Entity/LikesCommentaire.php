@@ -16,15 +16,13 @@ class LikesCommentaire
     #[ORM\Column(nullable: true)]
     private ?bool $like_type = null;
 
-    #[ORM\ManyToOne(inversedBy: 'likesCommentaires')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'likescommentaire')]
     #[ORM\JoinColumn(onDelete: "CASCADE")]
-    private ?User $user = null;
+    private ?User $user;
 
-    #[ORM\ManyToOne(inversedBy: 'likesCommentaires')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: Commentaire::class, inversedBy: 'likescommentaires')]
     #[ORM\JoinColumn(onDelete: "CASCADE")]
-    private ?Commentaire $commentaire = null;
+    private ?Commentaire $commentaire;
 
     public function getId(): ?int
     {

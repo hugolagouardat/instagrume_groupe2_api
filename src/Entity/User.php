@@ -43,24 +43,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $ban = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LikesPhoto::class)]
-    private Collection $likesPhotos;
+    private $likesPhoto;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Photo::class)]
-    private Collection $photos;
+    private $photo;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commentaire::class)]
-    private Collection $commentaires;
+    private $commentaires;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: LikesCommentaire::class)]
-    private Collection $likesCommentaires;
-
-    public function __construct()
-    {
-        $this->likesPhotos = new ArrayCollection();
-        $this->photos = new ArrayCollection();
-        $this->commentaires = new ArrayCollection();
-        $this->likesCommentaires = new ArrayCollection();
-    }
+    private $likesCommentaire;
 
     public function getId(): ?int
     {
@@ -168,122 +160,50 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, LikesPhoto>
-     */
-    public function getLikesPhotos(): Collection
+    public function getLikesPhoto()
     {
-        return $this->likesPhotos;
+        return $this->likesPhoto;
     }
 
-    public function addLikesPhoto(LikesPhoto $likesPhoto): static
+    public function setLikesPhoto($likesPhoto)
     {
-        if (!$this->likesPhotos->contains($likesPhoto)) {
-            $this->likesPhotos->add($likesPhoto);
-            $likesPhoto->setUser($this);
-        }
+        $this->likesPhoto = $likesPhoto;
 
         return $this;
     }
 
-    public function removeLikesPhoto(LikesPhoto $likesPhoto): static
+    public function getPhoto()
     {
-        if ($this->likesPhotos->removeElement($likesPhoto)) {
-            // set the owning side to null (unless already changed)
-            if ($likesPhoto->getUser() === $this) {
-                $likesPhoto->setUser(null);
-            }
-        }
+        return $this->photo;
+    }
+
+    public function setPhoto($photo)
+    {
+        $this->photo = $photo;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Photo>
-     */
-    public function getPhotos(): Collection
-    {
-        return $this->photos;
-    }
-
-    public function addPhoto(Photo $photo): static
-    {
-        if (!$this->photos->contains($photo)) {
-            $this->photos->add($photo);
-            $photo->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removePhoto(Photo $photo): static
-    {
-        if ($this->photos->removeElement($photo)) {
-            // set the owning side to null (unless already changed)
-            if ($photo->getUser() === $this) {
-                $photo->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Commentaire>
-     */
-    public function getCommentaires(): Collection
+    public function getCommentaire()
     {
         return $this->commentaires;
     }
 
-    public function addCommentaire(Commentaire $commentaire): static
+    public function setCommentaire($commentaire)
     {
-        if (!$this->commentaires->contains($commentaire)) {
-            $this->commentaires->add($commentaire);
-            $commentaire->setUser($this);
-        }
+        $this->commentaires = $commentaire;
 
         return $this;
     }
 
-    public function removeCommentaire(Commentaire $commentaire): static
+    public function getLikesCommentaire()
     {
-        if ($this->commentaires->removeElement($commentaire)) {
-            // set the owning side to null (unless already changed)
-            if ($commentaire->getUser() === $this) {
-                $commentaire->setUser(null);
-            }
-        }
-
-        return $this;
+        return $this->likesCommentaire;
     }
 
-    /**
-     * @return Collection<int, LikesCommentaire>
-     */
-    public function getLikesCommentaires(): Collection
+    public function setLikesCommentaire($likesCommentaire)
     {
-        return $this->likesCommentaires;
-    }
-
-    public function addLikesCommentaire(LikesCommentaire $likesCommentaire): static
-    {
-        if (!$this->likesCommentaires->contains($likesCommentaire)) {
-            $this->likesCommentaires->add($likesCommentaire);
-            $likesCommentaire->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeLikesCommentaire(LikesCommentaire $likesCommentaire): static
-    {
-        if ($this->likesCommentaires->removeElement($likesCommentaire)) {
-            // set the owning side to null (unless already changed)
-            if ($likesCommentaire->getUser() === $this) {
-                $likesCommentaire->setUser(null);
-            }
-        }
+        $this->likesCommentaire = $likesCommentaire;
 
         return $this;
     }

@@ -16,13 +16,13 @@ class LikesPhoto
     #[ORM\Column(nullable: true)]
     private ?bool $like_type = null;
 
-    #[ORM\ManyToOne(inversedBy: 'likesPhotos')]
+    #[ORM\ManyToOne(inversedBy: 'LikesPhotos')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'likesPhotos')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Photo $photo = null;
+    #[ORM\ManyToOne(targetEntity: Photo::class, inversedBy: 'LikesPhoto')]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    private ?Photo $photo;
 
     public function getId(): ?int
     {

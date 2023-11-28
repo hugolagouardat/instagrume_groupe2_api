@@ -28,27 +28,21 @@ class Commentaire
     #[ORM\Column]
     private ?int $dislikes_count = null;
 
-    #[ORM\ManyToOne(inversedBy: 'commentaires')]
+    #[ORM\ManyToOne(inversedBy: 'commentaire')]
     #[ORM\JoinColumn(nullable: false)]
     private ?user $user = null;
 
-    #[ORM\ManyToOne(inversedBy: 'commentaires')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Photo $photo = null;
+    #[ORM\ManyToOne(targetEntity: Photo::class, inversedBy: 'commentaire')]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
+    private ?Photo $photo;
 
     #[ORM\OneToMany(mappedBy: 'commentaire', targetEntity: LikesCommentaire::class)]
-    #[ORM\JoinColumn(onDelete: "CASCADE")]
-    private Collection $likesCommentaires;
+    private $likesCommentaire;
 
 
-    #[ORM\OneToOne(targetEntity: Commentaire::class, mappedBy: 'commentaire', cascade: ['persist', 'remove'])]
-    private ?self $commentaire = null;
+    /*#[ORM\OneToOne(targetEntity: Commentaire::class, mappedBy: 'commentaire', cascade: ['persist', 'remove'])]
+    private ?self $commentaire = null;*/
 
-
-    public function __construct()
-    {
-        $this->likesCommentaires = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -127,37 +121,7 @@ class Commentaire
         return $this;
     }
 
-    /**
-     * @return Collection<int, LikesCommentaire>
-     */
-    public function getLikesCommentaires(): Collection
-    {
-        return $this->likesCommentaires;
-    }
-
-    public function addLikesCommentaire(LikesCommentaire $likesCommentaire): static
-    {
-        if (!$this->likesCommentaires->contains($likesCommentaire)) {
-            $this->likesCommentaires->add($likesCommentaire);
-            $likesCommentaire->setCommentaire($this);
-        }
-
-        return $this;
-    }
-
-    public function removeLikesCommentaire(LikesCommentaire $likesCommentaire): static
-    {
-        if ($this->likesCommentaires->removeElement($likesCommentaire)) {
-            // set the owning side to null (unless already changed)
-            if ($likesCommentaire->getCommentaire() === $this) {
-                $likesCommentaire->setCommentaire(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getCommentaire(): ?self
+    /*public function getCommentaire(): ?self
     {
         return $this->commentaire;
     }
@@ -165,6 +129,18 @@ class Commentaire
     public function setCommentaire(?self $commentaire): static
     {
         $this->commentaire = $commentaire;
+
+        return $this;
+    }*/
+
+    public function getLikesCommentaire()
+    {
+        return $this->likesCommentaire;
+    }
+
+    public function setLikesCommentaire($likesCommentaire)
+    {
+        $this->likesCommentaire = $likesCommentaire;
 
         return $this;
     }
