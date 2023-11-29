@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CommentaireRepository::class)]
 class Commentaire
@@ -28,20 +29,20 @@ class Commentaire
     #[ORM\Column]
     private ?int $dislikes_count = null;
 
-    
-
     #[ORM\OneToOne(targetEntity: Commentaire::class)]
-    #[ORM\JoinColumn(name: 'parentCommentId', referencedColumnName: 'id', nullable: true)]
+    #[ORM\JoinColumn(name: 'parentCommentId', referencedColumnName: 'id', nullable: true, onDelete: "CASCADE")]
     private ?self $commentaire = null;
 
     #[ORM\ManyToOne(inversedBy: 'commentaires')]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'commentaires')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     private ?Photo $photo = null;
 
     #[ORM\OneToMany(mappedBy: 'commentaire', targetEntity: LikesCommentaire::class)]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
     private Collection $likes_commentaire;
 
     public function __construct()
@@ -67,9 +68,9 @@ class Commentaire
         return $this;
     }
 
-    public function getDateCommentaire(): ?\DateTimeInterface
+    public function getDateCommentaire(): ?string
     {
-        return $this->date_commentaire;
+        return $this->date_commentaire ? $this->date_commentaire->format('Y-m-d H:i:s') : null;
     }
 
     public function setDateCommentaire(\DateTimeInterface $date_commentaire): static

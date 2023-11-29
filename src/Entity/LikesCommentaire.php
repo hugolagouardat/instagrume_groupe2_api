@@ -21,6 +21,7 @@ class LikesCommentaire
     private ?User $user;
 
     #[ORM\ManyToOne(inversedBy: 'likes_commentaire')]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?Commentaire $commentaire = null;
 
 

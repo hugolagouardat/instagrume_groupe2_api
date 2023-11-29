@@ -36,13 +36,15 @@ class Photo
     private ?bool $is_locked = null;
 
     #[ORM\ManyToOne(inversedBy: 'photo', targetEntity: User::class)]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
     private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'photo', targetEntity: LikesPhoto::class)]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
     private $likesPhoto;
 
     #[ORM\OneToMany(mappedBy: 'photo', targetEntity: Commentaire::class)]
+    #[ORM\JoinColumn(onDelete: "CASCADE")]
     private Collection $commentaires;
 
     public function __construct()
@@ -80,9 +82,9 @@ class Photo
         return $this;
     }
 
-    public function getDatePoste(): ?\DateTimeInterface
+    public function getDatePoste(): ?string
     {
-        return $this->date_poste;
+        return $this->date_poste ? $this->date_poste->format('Y-m-d H:i:s') : null;
     }
 
     public function setDatePoste(\DateTimeInterface $date_poste): static
@@ -128,18 +130,6 @@ class Photo
         return $this;
     }
 
-    public function getLikesPhoto()
-    {
-        return $this->likesPhoto;
-    }
-
-    public function setLikesPhoto($likesPhoto)
-    {
-        $this->likesPhoto = $likesPhoto;
-
-        return $this;
-    }
-
     public function getUser(): ?User
     {
         return $this->user;
@@ -148,36 +138,6 @@ class Photo
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Commentaire>
-     */
-    public function getCommentaires(): Collection
-    {
-        return $this->commentaires;
-    }
-
-    public function addCommentaire(Commentaire $commentaire): static
-    {
-        if (!$this->commentaires->contains($commentaire)) {
-            $this->commentaires->add($commentaire);
-            $commentaire->setPhoto($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCommentaire(Commentaire $commentaire): static
-    {
-        if ($this->commentaires->removeElement($commentaire)) {
-            // set the owning side to null (unless already changed)
-            if ($commentaire->getPhoto() === $this) {
-                $commentaire->setPhoto(null);
-            }
-        }
 
         return $this;
     }

@@ -150,7 +150,7 @@ class AppFixtures extends Fixture
         $commentaire2->setDislikesCount(5);
         $commentaire2->setUser($userCom2);
         $commentaire2->setPhoto($photo1);
-        $commentaire2->setCommentaire($commentaire1);
+        //$commentaire2->setCommentaire($commentaire1);
         $manager->persist($commentaire2);
         $manager->flush();
 
