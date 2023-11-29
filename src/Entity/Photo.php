@@ -43,9 +43,13 @@ class Photo
     private $likesPhoto;
 
     #[ORM\OneToMany(mappedBy: 'photo', targetEntity: Commentaire::class)]
-    #[ORM\JoinColumn(nullable: true)]
-    private $commentaire;
-    
+    private Collection $commentaires;
+
+    public function __construct()
+    {
+        $this->commentaires = new ArrayCollection();
+    }
+
 
     public function getId(): ?int
     {
@@ -124,18 +128,6 @@ class Photo
         return $this;
     }
 
-    public function getCommentaire()
-    {
-        return $this->commentaire;
-    }
-
-    public function setCommentaire($commentaire)
-    {
-        $this->commentaire = $commentaire;
-
-        return $this;
-    }
-
     public function getLikesPhoto()
     {
         return $this->likesPhoto;
@@ -156,6 +148,36 @@ class Photo
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commentaire>
+     */
+    public function getCommentaires(): Collection
+    {
+        return $this->commentaires;
+    }
+
+    public function addCommentaire(Commentaire $commentaire): static
+    {
+        if (!$this->commentaires->contains($commentaire)) {
+            $this->commentaires->add($commentaire);
+            $commentaire->setPhoto($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommentaire(Commentaire $commentaire): static
+    {
+        if ($this->commentaires->removeElement($commentaire)) {
+            // set the owning side to null (unless already changed)
+            if ($commentaire->getPhoto() === $this) {
+                $commentaire->setPhoto(null);
+            }
+        }
 
         return $this;
     }
