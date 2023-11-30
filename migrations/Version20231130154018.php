@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20231129090804 extends AbstractMigration
+final class Version20231130154018 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -23,16 +23,16 @@ final class Version20231129090804 extends AbstractMigration
         $this->addSql('CREATE TABLE commentaire (id INT AUTO_INCREMENT NOT NULL, user_id INT DEFAULT NULL, photo_id INT NOT NULL, description VARCHAR(255) NOT NULL, date_commentaire DATETIME NOT NULL, likes_count INT NOT NULL, dislikes_count INT NOT NULL, parentCommentId INT DEFAULT NULL, UNIQUE INDEX UNIQ_67F068BC556CA8E7 (parentCommentId), INDEX IDX_67F068BCA76ED395 (user_id), INDEX IDX_67F068BC7E9E4C8C (photo_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE likes_commentaire (id INT AUTO_INCREMENT NOT NULL, user_id INT DEFAULT NULL, commentaire_id INT DEFAULT NULL, like_type TINYINT(1) DEFAULT NULL, INDEX IDX_1A3A4385A76ED395 (user_id), INDEX IDX_1A3A4385BA9CD190 (commentaire_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE likes_photo (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, photo_id INT DEFAULT NULL, like_type TINYINT(1) DEFAULT NULL, INDEX IDX_A84B289EA76ED395 (user_id), INDEX IDX_A84B289E7E9E4C8C (photo_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE photo (id INT AUTO_INCREMENT NOT NULL, user_id INT DEFAULT NULL, image VARCHAR(255) NOT NULL, description VARCHAR(255) DEFAULT NULL, date_poste DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, likes_count INT, dislikes_count INT, is_locked TINYINT(1) DEFAULT FALSE NOT NULL, INDEX IDX_14B78418A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE photo (id INT AUTO_INCREMENT NOT NULL, user_id INT DEFAULT NULL, image VARCHAR(255) NOT NULL, description VARCHAR(255) DEFAULT NULL, date_poste DATETIME NOT NULL, likes_count INT NOT NULL, dislikes_count INT NOT NULL, is_locked TINYINT(1) NOT NULL, INDEX IDX_14B78418A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE user (id INT AUTO_INCREMENT NOT NULL, username VARCHAR(180) NOT NULL, roles JSON NOT NULL COMMENT \'(DC2Type:json)\', password VARCHAR(255) NOT NULL, avatar VARCHAR(255) NOT NULL, description VARCHAR(255) DEFAULT NULL, ban TINYINT(1) NOT NULL, UNIQUE INDEX UNIQ_8D93D649F85E0677 (username), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE commentaire ADD CONSTRAINT FK_67F068BC556CA8E7 FOREIGN KEY (parentCommentId) REFERENCES commentaire (id)');
-        $this->addSql('ALTER TABLE commentaire ADD CONSTRAINT FK_67F068BCA76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
-        $this->addSql('ALTER TABLE commentaire ADD CONSTRAINT FK_67F068BC7E9E4C8C FOREIGN KEY (photo_id) REFERENCES photo (id)');
+        $this->addSql('ALTER TABLE commentaire ADD CONSTRAINT FK_67F068BC556CA8E7 FOREIGN KEY (parentCommentId) REFERENCES commentaire (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE commentaire ADD CONSTRAINT FK_67F068BCA76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE commentaire ADD CONSTRAINT FK_67F068BC7E9E4C8C FOREIGN KEY (photo_id) REFERENCES photo (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE likes_commentaire ADD CONSTRAINT FK_1A3A4385A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE likes_commentaire ADD CONSTRAINT FK_1A3A4385BA9CD190 FOREIGN KEY (commentaire_id) REFERENCES commentaire (id)');
-        $this->addSql('ALTER TABLE likes_photo ADD CONSTRAINT FK_A84B289EA76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE likes_commentaire ADD CONSTRAINT FK_1A3A4385BA9CD190 FOREIGN KEY (commentaire_id) REFERENCES commentaire (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE likes_photo ADD CONSTRAINT FK_A84B289EA76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE likes_photo ADD CONSTRAINT FK_A84B289E7E9E4C8C FOREIGN KEY (photo_id) REFERENCES photo (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE photo ADD CONSTRAINT FK_14B78418A76ED395 FOREIGN KEY (user_id) REFERENCES user (id)');
+        $this->addSql('ALTER TABLE photo ADD CONSTRAINT FK_14B78418A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
     }
 
     public function down(Schema $schema): void

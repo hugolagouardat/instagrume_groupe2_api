@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Photo;
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,6 +24,8 @@ use OpenApi\Attributes as OA;
 
 use App\Service\JsonConverter;
 use App\Entity\User;
+use App\Entity\Photo;
+use DateTime;
 
 class PhotoController extends AbstractController
 {
@@ -115,16 +115,16 @@ class PhotoController extends AbstractController
         description: 'La photo à été modifié'
     )]
     #[OA\RequestBody(
-		required: true,
-		content: new OA\JsonContent(
-			type: 'object',
-			properties: [
+        required: true,
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
                 new OA\Property(property: 'id', type: 'int'),
                 new OA\Property(property: 'description', type: 'string'),
-                
-			]
-		)
-	)]
+
+            ]
+        )
+    )]
     #[OA\Tag(name: 'photos')]
     public function updatePhoto(Request $request, ManagerRegistry $doctrine)
     {
@@ -158,7 +158,8 @@ class PhotoController extends AbstractController
         return new JsonResponse($jsonObject, JsonResponse::HTTP_OK, [], true);
     }
 
-    /*#[Route('/api/photos', methods: ['POST'])]
+    //Ajouter une nouvelle photo
+    #[Route('/api/photos', methods: ['POST'])]
     public function addPhoto(Request $request, ManagerRegistry $doctrine)
     {
         $data = json_decode($request->getContent(), true);
@@ -174,20 +175,33 @@ class PhotoController extends AbstractController
         $photo = new Photo();
         $photo->setImage($data['image']);
         $photo->setDescription($data['description']);
-        $abeille->setType($type);
-        $abeille->setRuche($ruche);
 
-        $entityManager = $doctrine->getManager();
-        $entityManager->persist($abeille);
+        $date = new DateTime();
+        $photo->setDatePoste($date);
+
+        if (isset($data['is_locked'])) {
+            $photo->setIsLocked($data['is_locked']);
+        } else {
+            $photo->setIsLocked(false);
+        }
+
+        $user = $entityManager->getRepository(User::class)->find($data['user_id']);
+
+        if (!$user) {
+            return new JsonResponse("L'utilisateur n'existe pas.", Response::HTTP_NOT_FOUND);
+        }
+        $photo->setUser($user);
+
+        $entityManager->persist($photo);
         $entityManager->flush();
 
         $serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
-        $jsonObject = $serializer->serialize($ruche, 'json', [
-            'circular_reference_handler' => function ($ruche) {
-                return $ruche->getId();
+        $jsonObject = $serializer->serialize($photo, 'json', [
+            'circular_reference_handler' => function ($photo) {
+                return $photo->getId();
             }
         ]);
 
         return new Response($jsonObject, Response::HTTP_CREATED);
-    }*/
+    }
 }
