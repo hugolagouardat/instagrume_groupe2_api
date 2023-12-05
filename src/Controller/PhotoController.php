@@ -19,9 +19,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
-
 use OpenApi\Attributes as OA;
-
 use App\Service\JsonConverter;
 use App\Entity\User;
 use App\Entity\Photo;
@@ -33,12 +31,12 @@ class PhotoController extends AbstractController
     //Récupérer toutes les photos
     #[Route('/api/photos', methods: ['GET'])]
     #[Security(name: null)]
-    #[OA\Post(description: 'Récupération de toutes les photos')]
+    #[OA\Get(description: 'Récupération de toutes les photos')]
     #[OA\Response(
         response: 200,
         description: 'Toutes les photos'
     )]
-    #[OA\Tag(name: 'photos')]
+    #[OA\Tag(name: 'Photos')]
     public function getAllPhotos(ManagerRegistry $doctrine): JsonResponse
     {
         $entityManager = $doctrine->getManager();
@@ -57,12 +55,17 @@ class PhotoController extends AbstractController
     //Récupérer une photo par son id
     #[Route('/api/photos/{id}', methods: ['GET'])]
     #[Security(name: null)]
-    #[OA\Post(description: 'Récupérer une photo par son id')]
+    #[OA\Get(description: 'Récupérer une photo par son id')]
     #[OA\Response(
         response: 200,
-        description: 'La photo est récupérée'
+        description: 'La photo est récupérée',
+        content: new OA\JsonContent(ref: '#/components/schemas/Photo')
     )]
-    #[OA\Tag(name: 'photos')]
+    #[OA\Response(
+        response: 404,
+        description: 'Photo non trouvée'
+    )]
+    #[OA\Tag(name: 'Photos')]
     public function getPhotoById(ManagerRegistry $doctrine, $id): JsonResponse
     {
         $entityManager = $doctrine->getManager();
@@ -85,12 +88,16 @@ class PhotoController extends AbstractController
     //Supprimer une photo
     #[Route('/api/photos/{id}', methods: ['DELETE'])]
     #[Security(name: null)]
-    #[OA\Post(description: 'Supprimer une photo avec son id')]
+    #[OA\Delete(description: 'Supprimer une photo avec son id')]
     #[OA\Response(
         response: 200,
-        description: 'La photo à été supprimé'
+        description: 'La photo a été supprimée'
     )]
-    #[OA\Tag(name: 'photos')]
+    #[OA\Response(
+        response: 404,
+        description: 'Photo non trouvée'
+    )]
+    #[OA\Tag(name: 'Photos')]
     public function deletePhoto($id, ManagerRegistry $doctrine)
     {
         $entityManager = $doctrine->getManager();
@@ -109,10 +116,14 @@ class PhotoController extends AbstractController
     //Modifier une photo
     #[Route('/api/photos', methods: ['PUT'])]
     #[Security(name: null)]
-    #[OA\Post(description: 'Modifier une photo avec son id')]
+    #[OA\Put(description: 'Modifier une photo avec son id')]
     #[OA\Response(
         response: 200,
-        description: 'La photo à été modifié'
+        description: 'La photo a été modifiée'
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Photo non trouvée'
     )]
     #[OA\RequestBody(
         required: true,
@@ -125,7 +136,7 @@ class PhotoController extends AbstractController
             ]
         )
     )]
-    #[OA\Tag(name: 'photos')]
+    #[OA\Tag(name: 'Photos')]
     public function updatePhoto(Request $request, ManagerRegistry $doctrine)
     {
         $data = json_decode($request->getContent(), true);
@@ -160,6 +171,34 @@ class PhotoController extends AbstractController
 
     //Ajouter une nouvelle photo
     #[Route('/api/photos', methods: ['POST'])]
+    #[Security(name: null)]
+    #[OA\Post(description: 'cree une photo')]
+    #[OA\Response(
+        response: 201,
+        description: 'Photo créée',
+        content: new OA\JsonContent(ref: '#/components/schemas/Photo')
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'Données invalides'
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Utilisateur non trouvé'
+    )]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(property: 'image', type: 'string'),
+                new OA\Property(property: 'description', type: 'string'),
+                new OA\Property(property: 'user_id', type: 'int'),
+                new OA\Property(property: 'is_locked', type: 'boolean')
+            ]
+        )
+    )]
+    #[OA\Tag(name: 'Photos')]
     public function addPhoto(Request $request, ManagerRegistry $doctrine)
     {
         $data = json_decode($request->getContent(), true);
@@ -175,6 +214,8 @@ class PhotoController extends AbstractController
         $photo = new Photo();
         $photo->setImage($data['image']);
         $photo->setDescription($data['description']);
+        $photo->setDislikesCount(0);
+        $photo->setLikesCount(0);
 
         $date = new DateTime();
         $photo->setDatePoste($date);

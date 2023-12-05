@@ -29,9 +29,9 @@ class Commentaire
     #[ORM\Column]
     private ?int $dislikes_count = null;
 
-    #[ORM\OneToOne(targetEntity: Commentaire::class)]
-    #[ORM\JoinColumn(name: 'parentCommentId', referencedColumnName: 'id', nullable: true, onDelete: "CASCADE")]
-    private ?self $commentaire = null;
+    //#[ORM\OneToOne(targetEntity: Commentaire::class)]
+    //#[ORM\JoinColumn(name: 'parentCommentId', referencedColumnName: 'id', nullable: true, onDelete: "CASCADE")]
+    //private ?self $commentaire = null;
 
     #[ORM\ManyToOne(inversedBy: 'commentaires')]
     #[ORM\JoinColumn(onDelete: "CASCADE")]
@@ -105,7 +105,7 @@ class Commentaire
     }
 
    
-    public function getCommentaire(): ?self
+    /*public function getCommentaire(): ?self
     {
         return $this->commentaire;
     }
@@ -115,7 +115,7 @@ class Commentaire
         $this->commentaire = $commentaire;
 
         return $this;
-    }
+    }*/
 
     public function getUser(): ?User
     {

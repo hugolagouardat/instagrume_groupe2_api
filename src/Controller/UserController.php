@@ -89,7 +89,7 @@ class UserController extends AbstractController {
 
 
 
-    #[Route('/api/newuser', methods: ['POST'])]
+    #[Route('/api/users', methods: ['POST'])]
     #[OA\Post(description: 'Crée un nouvel utilisateur')]
 	#[OA\Response(
 		response: 200,
@@ -136,7 +136,7 @@ class UserController extends AbstractController {
     // erreur inconu voir la doc
 
     
-    #[Route('/api/updateuser', methods: ['PUT'])]
+    #[Route('/api/users', methods: ['PUT'])]
     #[OA\Put(description: 'Update un nouvel utilisateur')]
 	#[OA\Response(
 		response: 200,
@@ -176,11 +176,8 @@ class UserController extends AbstractController {
     }
 
 
-
-
     //pas d'erreur mais ne trouve pas l'user
-
-    #[Route('/api/users/search/{username}', methods: ['GET'])]
+    #[Route('/api/users/{username}', methods: ['GET'])]
     #[OA\Get(description: 'Retourne le profil de l\'utilisateur rechercher')]
 	#[OA\Response(
 		response: 200,
@@ -197,14 +194,9 @@ class UserController extends AbstractController {
 	#[OA\Tag(name: 'utilisateurs')]
 	public function getUserByName(ManagerRegistry $doctrine, $username) {
 		$entityManager = $doctrine->getManager();
-       
-        $user = $entityManager->getRepository(user::class)->find($username);
-        $entityManager->flush();
-
+        $user = $entityManager->getRepository(user::class)->findOneBy(['username' => $username]);
         return new Response($this->jsonConverter->encodeToJson($user));
     }
-
-
     
 
 }
