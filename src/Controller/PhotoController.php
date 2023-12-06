@@ -54,17 +54,16 @@ class PhotoController extends AbstractController
 
     //Récupérer une photo par son id
     #[Route('/api/photos/{id}', methods: ['GET'])]
-    /*#[Security(name: null)]
+    #[Security(name: null)]
     #[OA\Get(description: 'Récupérer une photo par son id')]
     #[OA\Response(
         response: 200,
         description: 'La photo est récupérée',
-        content: new OA\JsonContent(ref: '#/components/schemas/Photo')
     )]
     #[OA\Response(
         response: 404,
         description: 'Photo non trouvée'
-    )]*/
+    )]
     #[OA\Tag(name: 'Photos')]
     public function getPhotoById(ManagerRegistry $doctrine, $id): JsonResponse
     {
@@ -171,34 +170,34 @@ class PhotoController extends AbstractController
 
     //Ajouter une nouvelle photo
     #[Route('/api/photos', methods: ['POST'])]
-/*#[Security(name: null)]
-#[OA\Post(description: 'cree une photo')]
-#[OA\Response(
-    response: 201,
-    description: 'Photo créée',
-    content: new OA\JsonContent(ref: '#/components/schemas/Photo')
-)]
-#[OA\Response(
-    response: 400,
-    description: 'Données invalides'
-)]
-#[OA\Response(
-    response: 404,
-    description: 'Utilisateur non trouvé'
-)]
-#[OA\RequestBody(
-    required: true,
-    content: new OA\JsonContent(
-        type: 'object',
-        properties: [
-            new OA\Property(property: 'image', type: 'string'),
-            new OA\Property(property: 'description', type: 'string'),
-            new OA\Property(property: 'user_id', type: 'int'),
-            new OA\Property(property: 'is_locked', type: 'boolean')
-        ]
-    )
-)]*/
-#[OA\Tag(name: 'Photos')]
+    #[OA\Post(
+		description: 'cree une photo',
+        requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(property: 'image', type: 'string'),
+                new OA\Property(property: 'description', type: 'string'),
+                new OA\Property(property: 'user_id', type: 'int'),
+                new OA\Property(property: 'is_locked', type: 'boolean')
+            ])
+        )
+	)]
+    #[OA\Response(
+        response: 201,
+        description: 'Photo créée',
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'Données invalides'
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Utilisateur non trouvé'
+    )]
+    
+    #[OA\Tag(name: 'Photos')]
     public function addPhoto(Request $request, ManagerRegistry $doctrine)
     {
         $data = json_decode($request->getContent(), true);

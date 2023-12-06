@@ -195,4 +195,52 @@ class CommentaireController extends AbstractController
         return new JsonResponse($response, Response::HTTP_OK);
     }
 
+    #[Route('/api/commentaires', methods: ['GET'])]
+    #[OA\Get(
+        description: 'Récupérer tous les commentaires',
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Liste de tous les commentaires',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        properties: [
+                            new OA\Property(property: 'commentaireId', type: 'integer'),
+                            new OA\Property(property: 'description', type: 'string'),
+                            new OA\Property(property: 'userId', type: 'integer'),
+                            new OA\Property(property: 'photoId', type: 'integer')
+                        ]
+                    )
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Aucun commentaire trouvé'
+            )
+        ]
+    )]
+    #[OA\Tag(name: 'Commentaire')]
+    public function getAllCommentaires(ManagerRegistry $doctrine): JsonResponse
+    {
+        $entityManager = $doctrine->getManager();
+        $commentaires = $entityManager->getRepository(Commentaire::class)->findAll();
+        $response = [];
+
+        foreach ($commentaires as $commentaire) {
+            $response[] = [
+                'commentaireId' => $commentaire->getId(),
+                'description' => $commentaire->getDescription(),
+                'userId' => $commentaire->getUser()->getId(),
+                'photoId' => $commentaire->getPhoto()->getId(),
+            ];
+        }
+
+        if (empty($response)) {
+            return new JsonResponse("Aucun commentaire trouvé", Response::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($response, Response::HTTP_OK);
+    }
+
 }
