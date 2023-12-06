@@ -111,18 +111,9 @@ class LikesCommentaireController extends AbstractController
     }
 
     // Récupérer tous les likes et dislikes d'un commentaire
-    #[Route('/api/commentlikes', methods: ['GET'])]
+    #[Route('/api/commentaires/{commentaireId}/likes', methods: ['GET'])]
     #[OA\Get(
         description: 'Récupérer tous les likes et dislikes d\'un commentaire',
-        parameters: [
-            new OA\Parameter(
-                name: 'commentaireId',
-                in: 'query',
-                required: true,
-                description: 'L\'ID du commentaire',
-                schema: new OA\Schema(type: 'integer')
-            )
-        ],
         responses: [
             new OA\Response(
                 response: 200,
@@ -145,9 +136,8 @@ class LikesCommentaireController extends AbstractController
         ]
     )]
     #[OA\Tag(name: 'LikesCommentaire')]
-    public function getLikesByCommentaire(Request $request, ManagerRegistry $doctrine): JsonResponse
+    public function getLikesByCommentaire(ManagerRegistry $doctrine, int $commentaireId): JsonResponse
     {
-        $commentaireId = $request->query->get('commentaireId');
         $entityManager = $doctrine->getManager();
         $commentaire = $entityManager->getRepository(Commentaire::class)->find($commentaireId);
 

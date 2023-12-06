@@ -102,18 +102,9 @@ class LikesPhotoController extends AbstractController
     }
 
     // Récupérer tous les likes d'une photo
-    #[Route('/api/photolikes', methods: ['GET'])]
+    #[Route('/api/photos/{photoId}/likes', methods: ['GET'])]
     #[OA\Get(
         description: 'Récupérer tous les likes et dislikes d\'une photo',
-        parameters: [
-            new OA\Parameter(
-                name: 'photoId',
-                in: 'query',
-                required: true,
-                description: 'L\'ID de la photo',
-                schema: new OA\Schema(type: 'integer')
-            )
-        ],
         responses: [
             new OA\Response(
                 response: 200,
@@ -136,9 +127,8 @@ class LikesPhotoController extends AbstractController
         ]
     )]
     #[OA\Tag(name: 'LikesPhoto')]
-    public function getLikesByPhoto(Request $request, ManagerRegistry $doctrine): JsonResponse
+    public function getLikesByPhoto(ManagerRegistry $doctrine, int $photoId): JsonResponse
     {
-        $photoId = $request->query->get('photoId');
         $entityManager = $doctrine->getManager();
         $photo = $entityManager->getRepository(Photo::class)->find($photoId);
 
