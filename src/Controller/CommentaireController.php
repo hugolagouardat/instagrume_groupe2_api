@@ -149,18 +149,9 @@ class CommentaireController extends AbstractController
     }
 
     // Récupérer tous les commentaires d'une photo
-    #[Route('/api/commentaires', methods: ['GET'])]
+    #[Route('/api/photos/{photoId}/commentaires', methods: ['GET'])]
     #[OA\Get(
         description: 'Récupérer tous les commentaires d\'une photo',
-        parameters: [
-            new OA\Parameter(
-                name: 'photoId',
-                in: 'query',
-                required: true,
-                description: 'L\'ID de la photo',
-                schema: new OA\Schema(type: 'integer')
-            )
-        ],
         responses: [
             new OA\Response(
                 response: 200,
@@ -183,9 +174,8 @@ class CommentaireController extends AbstractController
         ]
     )]
     #[OA\Tag(name: 'Commentaire')]
-    public function getCommentairesByPhoto(Request $request, ManagerRegistry $doctrine): JsonResponse
+    public function getCommentairesByPhoto(ManagerRegistry $doctrine, int $photoId): JsonResponse
     {
-        $photoId = $request->query->get('photoId');
         $entityManager = $doctrine->getManager();
         $commentaires = $entityManager->getRepository(Commentaire::class)->findBy(['photo' => $photoId]);
         $response = [];
@@ -198,6 +188,11 @@ class CommentaireController extends AbstractController
             ];
         }
 
+        if (empty($response)) {
+            return new JsonResponse("Aucun commentaire trouvé pour la photo avec l'ID " . $photoId, Response::HTTP_NOT_FOUND);
+        }
+
         return new JsonResponse($response, Response::HTTP_OK);
     }
+
 }
