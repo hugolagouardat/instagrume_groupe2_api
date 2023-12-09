@@ -13,6 +13,9 @@ use App\Entity\User;
 use App\Entity\Photo;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use OpenApi\Attributes as OA;
 
 class CommentaireController extends AbstractController
@@ -225,22 +228,15 @@ class CommentaireController extends AbstractController
     {
         $entityManager = $doctrine->getManager();
         $commentaires = $entityManager->getRepository(Commentaire::class)->findAll();
-        $response = [];
 
-        foreach ($commentaires as $commentaire) {
-            $response[] = [
-                'commentaireId' => $commentaire->getId(),
-                'description' => $commentaire->getDescription(),
-                'userId' => $commentaire->getUser()->getId(),
-                'photoId' => $commentaire->getPhoto()->getId(),
-            ];
-        }
+        $serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
+        $jsonObject = $serializer->serialize($commentaires, 'json', [
+            'circular_reference_handler' => function ($commentaires) {
+                return $commentaires->getId();
+            }
+        ]);
 
-        if (empty($response)) {
-            return new JsonResponse("Aucun commentaire trouvé", Response::HTTP_NOT_FOUND);
-        }
-
-        return new JsonResponse($response, Response::HTTP_OK);
+        return new JsonResponse($jsonObject, JsonResponse::HTTP_OK, [], true);
     }
 
 }
