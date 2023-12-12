@@ -29,9 +29,9 @@ class Commentaire
     #[ORM\Column]
     private ?int $dislikes_count = null;
 
-    //#[ORM\OneToOne(targetEntity: Commentaire::class)]
-    //#[ORM\JoinColumn(name: 'parentCommentId', referencedColumnName: 'id', nullable: true, onDelete: "CASCADE")]
-    //private ?self $commentaire = null;
+    #[ORM\ManyToOne(targetEntity: Commentaire::class, inversedBy: 'commentairesEnfants')]
+    #[ORM\JoinColumn(name: 'commentaire_parent_id', referencedColumnName: 'id', onDelete: "CASCADE", nullable: true)]
+    private ?Commentaire $commentaireParent;
 
     #[ORM\ManyToOne(inversedBy: 'commentaires')]
     #[ORM\JoinColumn(onDelete: "CASCADE")]
@@ -70,7 +70,7 @@ class Commentaire
 
     public function getDateCommentaire(): ?string
     {
-        return $this->date_commentaire ? $this->date_commentaire->format('Y-m-d H:i:s') : null;
+        return $this->date_commentaire ? $this->date_commentaire->format('d/m/Y H:i:s') : null;
     }
 
     public function setDateCommentaire(\DateTimeInterface $date_commentaire): static
@@ -105,17 +105,17 @@ class Commentaire
     }
 
    
-    /*public function getCommentaire(): ?self
+    public function getCommentaireParent(): ?self
     {
-        return $this->commentaire;
+        return $this->commentaireParent;
     }
 
-    public function setCommentaire(?self $commentaire): static
+    public function setCommentaireParent(?self $commentaire): static
     {
-        $this->commentaire = $commentaire;
+        $this->commentaireParent = $commentaire;
 
         return $this;
-    }*/
+    }
 
     public function getUser(): ?User
     {

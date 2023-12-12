@@ -84,7 +84,7 @@ class Photo
 
     public function getDatePoste(): ?string
     {
-        return $this->date_poste ? $this->date_poste->format('Y-m-d H:i:s') : null;
+        return $this->date_poste ? $this->date_poste->format('d/m/Y H:i:s') : null;
     }
 
     public function setDatePoste(\DateTimeInterface $date_poste): static

@@ -21,14 +21,14 @@ use OpenApi\Attributes as OA;
 class CommentaireController extends AbstractController
 {
     // Ajouter un commentaire à une photo
-    #[Route('/api/commentaires', methods: ['POST'])]
+    #[Route('/api/photos/{photoId}/commentaires', methods: ['POST'])]
     #[OA\Post(
         description: 'Ajouter un commentaire à une photo',
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
                 properties: [
-                    new OA\Property(property: 'photoId', type: 'integer'),
+                    
                     new OA\Property(property: 'userId', type: 'integer'),
                     new OA\Property(property: 'description', type: 'string')
                 ]
@@ -46,10 +46,9 @@ class CommentaireController extends AbstractController
         ]
     )]
     #[OA\Tag(name: 'Commentaire')]
-    public function addCommentaire(Request $request, ManagerRegistry $doctrine): JsonResponse
+    public function addCommentaire(Request $request, ManagerRegistry $doctrine, int $photoId): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $photoId = $data['photoId'];
         $entityManager = $doctrine->getManager();
         $photo = $entityManager->getRepository(Photo::class)->find($photoId);
 
@@ -69,6 +68,14 @@ class CommentaireController extends AbstractController
         $commentaire->setLikesCount(0);
         $commentaire->setDescription($data['description']);
         $commentaire->setDateCommentaire(new \DateTime());
+
+        if (isset($data['parentCommentId'])) {
+            $idCommentaireParent = $data['parentCommentId'];
+            var_dump($idCommentaireParent);
+            $commentaireParent = $entityManager->getRepository(Commentaire::class)->find($idCommentaireParent);
+            $commentaire->setCommentaireParent($commentaireParent);
+        }
+               
 
         $entityManager->persist($commentaire);
         $entityManager->flush();
