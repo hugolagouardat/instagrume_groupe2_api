@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class CommentaireController extends AbstractController
 {
@@ -28,7 +29,7 @@ class CommentaireController extends AbstractController
             required: true,
             content: new OA\JsonContent(
                 properties: [
-                    
+
                     new OA\Property(property: 'userId', type: 'integer'),
                     new OA\Property(property: 'description', type: 'string')
                 ]
@@ -46,7 +47,7 @@ class CommentaireController extends AbstractController
         ]
     )]
     #[OA\Tag(name: 'Commentaire')]
-    public function addCommentaire(Request $request, ManagerRegistry $doctrine, int $photoId): JsonResponse
+    public function addCommentaire(Request $request, ManagerRegistry $doctrine, TokenStorageInterface $tokenStorage, $photoId): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $entityManager = $doctrine->getManager();
@@ -56,9 +57,14 @@ class CommentaireController extends AbstractController
             return new JsonResponse("La photo avec l'ID " . $photoId . " n'existe pas.", Response::HTTP_NOT_FOUND);
         }
 
-        $user = $entityManager->getRepository(User::class)->find($data['userId']);
-        if (!$user) {
-            return new JsonResponse("L'utilisateur n'existe pas.", Response::HTTP_NOT_FOUND);
+        // Obtention de l'utilisateur connecté
+        $user = $tokenStorage->getToken()->getUser();
+
+        // Vérification si l'utilisateur est bien connecté et récupération de son ID
+        if ($user instanceof User) {
+        
+        } else {
+            return new JsonResponse("Utilisateur non connecté.", Response::HTTP_UNAUTHORIZED);
         }
 
         $commentaire = new Commentaire();
@@ -75,7 +81,7 @@ class CommentaireController extends AbstractController
             $commentaireParent = $entityManager->getRepository(Commentaire::class)->find($idCommentaireParent);
             $commentaire->setCommentaireParent($commentaireParent);
         }
-               
+
 
         $entityManager->persist($commentaire);
         $entityManager->flush();
@@ -245,5 +251,4 @@ class CommentaireController extends AbstractController
 
         return new JsonResponse($jsonObject, JsonResponse::HTTP_OK, [], true);
     }
-
 }
