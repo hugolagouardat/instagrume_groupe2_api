@@ -56,13 +56,17 @@ class CommentaireController extends AbstractController
         if (!$photo) {
             return new JsonResponse("La photo avec l'ID " . $photoId . " n'existe pas.", Response::HTTP_NOT_FOUND);
         }
+        // Obtention du token et vérification s'il existe
+        $token = $tokenStorage->getToken();
+        if (!$token) {
+            return new JsonResponse("Token d'authentification non trouvé.", Response::HTTP_UNAUTHORIZED);
+        }
 
-        // Obtention de l'utilisateur connecté
-        $user = $tokenStorage->getToken()->getUser();
+        // Obtention de l'utilisateur connecté à partir du token
+        $user = $token->getUser();
 
         // Vérification si l'utilisateur est bien connecté et récupération de son ID
         if ($user instanceof User) {
-        
         } else {
             return new JsonResponse("Utilisateur non connecté.", Response::HTTP_UNAUTHORIZED);
         }

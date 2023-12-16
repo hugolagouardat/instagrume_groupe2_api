@@ -30,6 +30,8 @@ security:
          #- { path: ^/admin, roles: ROLE_ADMIN }
          #- { path: ^/profile, roles: ROLE_USER }
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
+        - { path: ^/, roles: PUBLIC_ACCESS }
+        
 
          
 
