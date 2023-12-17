@@ -209,5 +209,34 @@ class UserController extends AbstractController {
         return new Response($this->jsonConverter->encodeToJson($user));
     }
 
+    #[Route('/api/getIdByUsername/{username}', methods: ['GET'])]
+    #[OA\Get(description: "Retourne l'utilisateur authentifié par son username")]
+    #[OA\Response(
+        response: 200,
+        description: "Récupère l'id d'un utilisateur à partir de son username",
+        content: new OA\JsonContent(ref: new Model(type: User::class))
+    )]
+    #[OA\Tag(name: 'utilisateurs')]
+    public function getIdByUsername(ManagerRegistry $doctrine, $username)
+    {
+        $entityManager = $doctrine->getManager();
+
+        // Vérifiez si le paramètre username est présent dans l'URL
+        if (!$username) {
+            return new JsonResponse(['error' => "Le paramètre 'username' est nécessaire dans l'URL"], Response::HTTP_NOT_FOUND);
+        }
+
+        $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
+
+        // Vérifiez si l'utilisateur existe
+        if (!$user) {
+            return new JsonResponse(['error' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Retournez uniquement l'ID de l'utilisateur
+        $responseData = ['id' => $user->getId()];
+
+        return new JsonResponse($responseData);
+    }
 
 }

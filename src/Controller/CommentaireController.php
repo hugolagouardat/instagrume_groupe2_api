@@ -30,7 +30,7 @@ class CommentaireController extends AbstractController
             content: new OA\JsonContent(
                 properties: [
 
-                    new OA\Property(property: 'userId', type: 'integer'),
+                    new OA\Property(property: 'user_id', type: 'integer'),
                     new OA\Property(property: 'description', type: 'string')
                 ]
             )
@@ -56,31 +56,27 @@ class CommentaireController extends AbstractController
         if (!$photo) {
             return new JsonResponse("La photo avec l'ID " . $photoId . " n'existe pas.", Response::HTTP_NOT_FOUND);
         }
-        // Obtention du token et vérification s'il existe
-        $token = $tokenStorage->getToken();
-        if (!$token) {
-            return new JsonResponse("Token d'authentification non trouvé.", Response::HTTP_UNAUTHORIZED);
+        
+        if (!isset($data["user_id"])) {
+            return new JsonResponse("Le champ 'user_id' est vide.", Response::HTTP_NOT_FOUND);
         }
 
-        // Obtention de l'utilisateur connecté à partir du token
-        $user = $token->getUser();
+        $user = $entityManager->getRepository(User::class)->find($data["user_id"]);
 
-        // Vérification si l'utilisateur est bien connecté et récupération de son ID
-        if ($user instanceof User) {
-        } else {
-            return new JsonResponse("Utilisateur non connecté.", Response::HTTP_UNAUTHORIZED);
+        if (!$user) {
+            return new JsonResponse("L'utilisateur avec l'ID " . $data["user_id"] . " n'existe pas.", Response::HTTP_NOT_FOUND);
         }
 
         $commentaire = new Commentaire();
-        $commentaire->setUser($user);
         $commentaire->setPhoto($photo);
+        $commentaire->setUser($user);
         $commentaire->setDislikesCount(0);
         $commentaire->setLikesCount(0);
         $commentaire->setDescription($data['description']);
         $commentaire->setDateCommentaire(new \DateTime());
 
-        if (isset($data['parentCommentId'])) {
-            $idCommentaireParent = $data['parentCommentId'];
+        if (isset($data['parent_comment_id'])) {
+            $idCommentaireParent = $data['parent_comment_id'];
             var_dump($idCommentaireParent);
             $commentaireParent = $entityManager->getRepository(Commentaire::class)->find($idCommentaireParent);
             $commentaire->setCommentaireParent($commentaireParent);
