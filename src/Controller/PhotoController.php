@@ -76,6 +76,9 @@ class PhotoController extends AbstractController
         return new JsonResponse($jsonObject, JsonResponse::HTTP_OK, [], true);
     }
 
+
+
+
     //Supprimer une photo
     #[Route('/api/photos/{id}', methods: ['DELETE'])]
     #[Security(name: null)]
@@ -163,19 +166,19 @@ class PhotoController extends AbstractController
     //Ajouter une nouvelle photo
     #[Route('/api/photos', methods: ['POST'])]
     #[OA\Post(
-		description: 'cree une photo',
+        description: 'cree une photo',
         requestBody: new OA\RequestBody(
-        required: true,
-        content: new OA\JsonContent(
-            type: 'object',
-            properties: [
-                new OA\Property(property: 'image', type: 'string'),
-                new OA\Property(property: 'description', type: 'string'),
-                new OA\Property(property: 'user_id', type: 'int'),
-                new OA\Property(property: 'is_locked', type: 'boolean')
-            ])
+            required: true,
+            content: new OA\JsonContent(
+                type: 'object',
+                properties: [
+                    new OA\Property(property: 'image', type: 'string'),
+                    new OA\Property(property: 'description', type: 'string'),
+                    new OA\Property(property: 'user_id', type: 'int'),
+                    new OA\Property(property: 'is_locked', type: 'boolean')
+                ])
         )
-	)]
+    )]
     #[OA\Response(
         response: 201,
         description: 'Photo créée',
@@ -188,7 +191,7 @@ class PhotoController extends AbstractController
         response: 404,
         description: 'Utilisateur non trouvé'
     )]
-    
+
     #[OA\Tag(name: 'Photos')]
     public function addPhoto(Request $request, ManagerRegistry $doctrine)
     {
@@ -203,13 +206,21 @@ class PhotoController extends AbstractController
 
         // Créez une nouvelle instance de l'entité Photo
         $photo = new Photo();
-        $photo->setImage($data['image']);
         $photo->setDescription($data['description']);
         $photo->setDislikesCount(0);
         $photo->setLikesCount(0);
 
         $date = new DateTime();
         $photo->setDatePoste($date);
+
+        // Gestion de l'image en Base64
+        $imageBase64 = $data['image'];
+        $image = base64_decode($imageBase64);
+        $imageName = uniqid() . '.png';
+        file_put_contents(__DIR__ . '/../../public/images/photos' . $imageName, $image);
+
+        // Enregistrement du nom de fichier dans l'utilisateur
+        $photo->setImage($data['image']);
 
         if (isset($data['is_locked'])) {
             $photo->setIsLocked($data['is_locked']);

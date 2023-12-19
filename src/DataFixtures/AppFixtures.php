@@ -71,7 +71,7 @@ class AppFixtures extends Fixture
         $userPhoto1 = $manager->getRepository(User::class)->findOneBy(['username' => 'admin']);
 
         $photo1 = new Photo();
-        $photo1->setImage("default");
+        $photo1->setImage("BB99.png");
         $photo1->setDatePoste($datePhoto1);
         $photo1->setLikesCount(40);
         $photo1->setDislikesCount(10);
@@ -84,7 +84,7 @@ class AppFixtures extends Fixture
         $datePhoto3 = DateTime::createFromFormat('Y-m-d H:i:s', '2023-04-01 08:30:00');
 
         $photo2 = new Photo();
-        $photo2->setImage("default");
+        $photo2->setImage("chevaml.jpeg");
         $photo2->setDescription("Qu'il y a t'il de plus beau que cette poire ?");
         $photo2->setDatePoste($datePhoto3);
         $photo2->setLikesCount(4000);
@@ -99,7 +99,7 @@ class AppFixtures extends Fixture
         $userPhoto2 = $manager->getRepository(User::class)->findOneBy(['username' => 'standard']);
 
         $photo3 = new Photo();
-        $photo3->setImage("default");
+        $photo3->setImage("chien.png");
         $photo3->setDescription("Voici une belle pomme que j'ai acheté ce matin au marché");
         $photo3->setDatePoste($datePhoto2);
         $photo3->setLikesCount(1200);
@@ -114,7 +114,7 @@ class AppFixtures extends Fixture
         $userPhoto3 = $manager->getRepository(User::class)->findOneBy(['username' => 'lambda']);
 
         $photo4 = new Photo();
-        $photo4->setImage("default");
+        $photo4->setImage("horse.jpg");
         $photo4->setDescription("Très joli plat que j'ai cuisiné ce matin");
         $photo4->setDatePoste($datePhoto4);
         $photo4->setLikesCount(100);
