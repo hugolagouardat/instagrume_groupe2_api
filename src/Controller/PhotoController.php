@@ -217,7 +217,7 @@ class PhotoController extends AbstractController
         $imageBase64 = $data['image'];
         $image = base64_decode($imageBase64);
         $imageName = uniqid() . '.png';
-        file_put_contents(__DIR__ . '/../../public/images/photos' . $imageName, $image);
+        file_put_contents(__DIR__ . '/../../public/images/photos/' . $imageName, $image);
 
         // Enregistrement du nom de fichier dans l'utilisateur
         $photo->setImage($data['image']);

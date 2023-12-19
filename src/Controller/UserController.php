@@ -127,7 +127,7 @@ class UserController extends AbstractController {
         $imageBase64 = $data['avatar'];
         $image = base64_decode($imageBase64);
         $imageName = uniqid().'.png';
-        file_put_contents(__DIR__.'/../../public/images/avatar'.$imageName, $image);
+        file_put_contents(__DIR__.'/../../public/images/avatar/'.$imageName, $image);
 
         // Enregistrement du nom de fichier dans l'utilisateur
         $user->setAvatar($imageName);
