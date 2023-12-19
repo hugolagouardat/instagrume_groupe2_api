@@ -30,7 +30,7 @@ class AppFixtures extends Fixture
         $user1->setUserName('admin');
         $user1->setRoles(["ROLE_ADMIN"]);
         $user1->setPassword($this->passwordHasher->hashPassword($user1, 'admin'));
-        $user1->setAvatar("avatar");
+        $user1->setAvatar("horse.jpg");
         $user1->setBan(false);
         $manager->persist($user1);
         $manager->flush();
@@ -39,7 +39,7 @@ class AppFixtures extends Fixture
         $user2->setUsername('standard');
         $user2->setRoles(["ROLE_USER"]);
         $user2->setPassword($this->passwordHasher->hashPassword($user2, 'standard'));
-        $user2->setAvatar("avatar");
+        $user2->setAvatar("BB99.png");
         $user2->setDescription("Juliette, 25 ans, Marseille");
         $user2->setBan(true);
         $manager->persist($user2);
@@ -49,7 +49,7 @@ class AppFixtures extends Fixture
         $user3->setUsername('lambda');
         $user3->setRoles(["ROLE_USER"]);
         $user3->setPassword($this->passwordHasher->hashPassword($user3, 'lambda'));
-        $user3->setAvatar("avatar");
+        $user3->setAvatar("chevaml.jpeg");
         $user3->setDescription("Moi c'est Anthonio et j'adore les fruits et légumes");
         $user3->setBan(false);
         $manager->persist($user3);
@@ -59,7 +59,7 @@ class AppFixtures extends Fixture
         $user4->setUsername('modo');
         $user4->setRoles(["ROLE_ADMIN"]);
         $user4->setPassword($this->passwordHasher->hashPassword($user4, 'modo'));
-        $user4->setAvatar("avatar");
+        $user4->setAvatar("chien.png");
         $user4->setDescription("Représente le 93 avec les meilleures fruits du marché");
         $user4->setBan(false);
         $manager->persist($user4);
