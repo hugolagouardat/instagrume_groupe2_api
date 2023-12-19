@@ -64,11 +64,20 @@ class LikesPhotoController extends AbstractController
         $like->setPhoto($photo);
         $like->setLikeType($data['likeType'] ?? true);
 
+        if ($like->isLikeType()) {
+            $photo->setLikesCount($photo->getLikesCount() + 1);
+        } else {
+            $photo->setDislikesCount($photo->getDislikesCount() + 1);
+        }
+
         $entityManager->persist($like);
         $entityManager->flush();
 
         return new JsonResponse('Like ajouté avec succès.', Response::HTTP_CREATED);
     }
+
+
+
 
     // Supprimer un like d'une photo
     #[Route('/api/photolikes/{likeId}', methods: ['DELETE'])]
@@ -91,15 +100,25 @@ class LikesPhotoController extends AbstractController
         $entityManager = $doctrine->getManager();
         $like = $entityManager->getRepository(LikesPhoto::class)->find($likeId);
 
+        $photo = $like->getPhoto();
+
+
         if (!$like) {
             return new JsonResponse("Le like n'existe pas.", Response::HTTP_NOT_FOUND);
         }
-
+        if ($like->isLikeType()) {
+            $photo->setLikesCount($photo->getLikesCount() - 1);
+        } else {
+            $photo->setDislikesCount($photo->getDislikesCount() - 1);
+        }
         $entityManager->remove($like);
         $entityManager->flush();
 
         return new JsonResponse('Like supprimé avec succès.', Response::HTTP_OK);
     }
+
+
+
 
     // Récupérer tous les likes d'une photo
     #[Route('/api/photos/{photoId}/likes', methods: ['GET'])]

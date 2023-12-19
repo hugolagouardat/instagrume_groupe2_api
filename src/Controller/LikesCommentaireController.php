@@ -65,6 +65,11 @@ class LikesCommentaireController extends AbstractController
         $like->setCommentaire($commentaire);
         $like->setLikeType($data['likeType'] ?? true);
 
+        if ($like->isLikeType()) {
+            $commentaire->setLikesCount($commentaire->getLikesCount() + 1);
+        } else {
+            $commentaire->setDislikesCount($commentaire->getDislikesCount() + 1);
+        }
         $entityManager->persist($like);
         $entityManager->flush();
 
