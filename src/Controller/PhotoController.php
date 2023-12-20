@@ -247,4 +247,41 @@ class PhotoController extends AbstractController
 
         return new Response($jsonObject, Response::HTTP_CREATED);
     }
+
+
+    #[Route('/api/photos/user/{userId}', methods: ['GET'])]
+    #[Security(name: null)]
+    #[OA\Get(description: 'Récupération de toutes les photos d\'un utilisateur spécifique')]
+    #[OA\Response(
+        response: 200,
+        description: 'Toutes les photos de l\'utilisateur'
+    )]
+    #[OA\Parameter(
+        name: 'userId',
+        in: 'path',
+        required: true,
+        description: 'ID de l\'utilisateur',
+        schema: new OA\Schema(type: 'integer')
+    )]
+    #[OA\Tag(name: 'Photos')]
+    public function getPhotosByUserId(ManagerRegistry $doctrine, int $userId): JsonResponse
+    {
+        $entityManager = $doctrine->getManager();
+        $user = $entityManager->getRepository(User::class)->find($userId);
+
+        if (!$user) {
+            return new JsonResponse("L'utilisateur avec l'ID " . $userId . " n'existe pas.", Response::HTTP_NOT_FOUND);
+        }
+
+        $photos = $entityManager->getRepository(Photo::class)->findBy(['user' => $user], ['date_poste' => 'DESC']);
+
+        $serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
+        $jsonObject = $serializer->serialize($photos, 'json', [
+            'circular_reference_handler' => function ($object) {
+                return $object->getId();
+            }
+        ]);
+
+        return new JsonResponse($jsonObject, JsonResponse::HTTP_OK, [], true);
+    }
 }
