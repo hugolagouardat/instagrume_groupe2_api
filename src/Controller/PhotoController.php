@@ -76,9 +76,6 @@ class PhotoController extends AbstractController
         return new JsonResponse($jsonObject, JsonResponse::HTTP_OK, [], true);
     }
 
-
-
-
     //Supprimer une photo
     #[Route('/api/photos/{id}', methods: ['DELETE'])]
     #[Security(name: null)]

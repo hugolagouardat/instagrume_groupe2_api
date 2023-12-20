@@ -123,7 +123,17 @@ class LikesPhotoController extends AbstractController
         $entityManager->remove($like);
         $entityManager->flush();
 
-        return new JsonResponse('Like supprimé avec succès.', Response::HTTP_OK);
+        // Récupérer les données mises à jour après la suppression du like
+        $updatedLikesCount = $photo->getLikesCount();
+        $updatedDislikesCount = $photo->getDislikesCount();
+
+        // Renvoyer les données mises à jour
+        return new JsonResponse([
+            'message' => 'Like supprimé avec succès.',
+            'updatedLikeCount' => $updatedLikesCount,
+            'updatedDislikeCount' => $updatedDislikesCount,
+            'likeId' => $likeId
+        ], Response::HTTP_CREATED);
     }
 
 

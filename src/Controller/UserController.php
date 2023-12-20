@@ -20,12 +20,14 @@ use OpenApi\Attributes as OA;
 use App\Service\JsonConverter;
 use App\Entity\User;
 
-class UserController extends AbstractController {
+class UserController extends AbstractController
+{
 
     private $jsonConverter;
     private $passwordHasher;
 
-    public function __construct(JsonConverter $jsonConverter, UserPasswordHasherInterface $passwordHasher) {
+    public function __construct(JsonConverter $jsonConverter, UserPasswordHasherInterface $passwordHasher)
+    {
         $this->passwordHasher = $passwordHasher;
         $this->jsonConverter = $jsonConverter;
     }
@@ -48,22 +50,23 @@ class UserController extends AbstractController {
         )
     )]
     #[OA\Tag(name: 'utilisateurs')]
-    public function logUser(ManagerRegistry $doctrine, JWTTokenManagerInterface $JWTManager) {
+    public function logUser(ManagerRegistry $doctrine, JWTTokenManagerInterface $JWTManager)
+    {
         $request = Request::createFromGlobals();
         $data = json_decode($request->getContent(), true);
 
-        if(!is_array($data) || $data == null || empty($data['username']) || empty($data['password'])) {
-            return new Response('Identifiants invalides', 401);
+        if (!is_array($data) || $data == null || empty($data['username']) || empty($data['password'])) {
+            return new Response('Les champs ne doivent pas être vide', 401);
         }
 
         $entityManager = $doctrine->getManager();
         $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $data['username']]);
 
-        if(!$user) {
-            throw $this->createNotFoundException();
+        if (!$user) {
+            return new Response('Username invalide');
         }
-        if(!$this->passwordHasher->isPasswordValid($user, $data['password'])) {
-            return new Response('Identifiants invalides', 401);
+        if (!$this->passwordHasher->isPasswordValid($user, $data['password'])) {
+            return new Response('Password invalide');
         }
 
         $token = $JWTManager->create($user);
@@ -78,7 +81,8 @@ class UserController extends AbstractController {
         content: new OA\JsonContent(ref: new Model(type: User::class))
     )]
     #[OA\Tag(name: 'utilisateurs')]
-    public function getUtilisateur(JWTEncoderInterface $jwtEncoder, Request $request) {
+    public function getUtilisateur(JWTEncoderInterface $jwtEncoder, Request $request)
+    {
         $tokenString = str_replace('Bearer ', '', $request->headers->get('Authorization'));
 
         $user = $jwtEncoder->decode($tokenString);
@@ -91,7 +95,7 @@ class UserController extends AbstractController {
 
 
 
-    #[Route('/api/users', methods: ['POST'])]
+    #[Route('/api/createUser', methods: ['POST'])]
     #[OA\Post(description: 'Crée un nouvel utilisateur')]
     #[OA\Response(
         response: 200,
@@ -111,8 +115,8 @@ class UserController extends AbstractController {
         )
     )]
     #[OA\Tag(name: 'utilisateurs')]
-    #[Route('/createUser', methods: ['POST'])]
-    public function createUser(Request $request, ManagerRegistry $doctrine): Response {
+    public function createUser(Request $request, ManagerRegistry $doctrine): Response
+    {
         $entityManager = $doctrine->getManager();
         $data = json_decode($request->getContent(), true);
 
@@ -123,20 +127,27 @@ class UserController extends AbstractController {
         $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
         $user->setRoles(['ROLE_USER']);
 
-        // Gestion de l'image en Base64
-        $imageBase64 = $data['avatar'];
-        $image = base64_decode($imageBase64);
-        $imageName = uniqid().'.png';
-        file_put_contents(__DIR__.'/../../public/images/avatar/'.$imageName, $image);
+        if (isset($data['avatar'])) {
+            if ($data['avatar'] != "default.png") {
+                // Gestion de l'image en Base64
+                $imageBase64 = $data['avatar'];
+                $image = base64_decode($imageBase64);
+                $imageName = uniqid() . '.png';
+                file_put_contents(__DIR__ . '/../../public/images/avatar/' . $imageName, $image);
 
-        // Enregistrement du nom de fichier dans l'utilisateur
-        $user->setAvatar($imageName);
+                // Enregistrement du nom de fichier dans l'utilisateur
+                $user->setAvatar($imageName);
+            } else {
+                $user->setAvatar('default.png');
+            }
 
-        $entityManager->persist($user);
-        $entityManager->flush();
+            $entityManager->persist($user);
+            $entityManager->flush();
 
-        // Modification ici: retourner une réponse JSON structurée
-        return new JsonResponse(['success' => true, 'message' => 'Utilisateur créé avec succès'], Response::HTTP_CREATED);
+            // Modification ici: retourner une réponse JSON structurée
+            return new JsonResponse(['success' => true, 'message' => 'Utilisateur créé avec succès'], Response::HTTP_CREATED);
+        }
+        return new Response("L'image n'est pas définis.");
     }
 
 
@@ -167,12 +178,13 @@ class UserController extends AbstractController {
         )
     )]
     #[OA\Tag(name: 'utilisateurs')]
-    public function updateUser(ManagerRegistry $doctrine) {
+    public function updateUser(ManagerRegistry $doctrine)
+    {
         $entityManager = $doctrine->getManager();
         $request = Request::createFromGlobals();
         $data = json_decode($request->getContent(), true);
         $user = $doctrine->getRepository(User::class)->find($data['id']);
-        if(!$user) {
+        if (!$user) {
             throw $this->createNotFoundException(
                 "Pas d'utilisateur"
             );
@@ -203,7 +215,8 @@ class UserController extends AbstractController {
         description: 'Le nom d\'un utilisateur'
     )]
     #[OA\Tag(name: 'utilisateurs')]
-    public function getUserByName(ManagerRegistry $doctrine, $username) {
+    public function getUserByName(ManagerRegistry $doctrine, $username)
+    {
         $entityManager = $doctrine->getManager();
         $user = $entityManager->getRepository(user::class)->findOneBy(['username' => $username]);
         return new Response($this->jsonConverter->encodeToJson($user));
@@ -238,5 +251,4 @@ class UserController extends AbstractController {
 
         return new JsonResponse($responseData);
     }
-
 }
