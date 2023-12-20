@@ -73,7 +73,16 @@ class LikesCommentaireController extends AbstractController
         $entityManager->persist($like);
         $entityManager->flush();
 
-        return new JsonResponse('Like ajouté avec succès.', Response::HTTP_CREATED);
+        // Récupérer les données mises à jour après l'ajout du like
+        $updatedLikesCount = $commentaire->getLikesCount();
+        $updatedDislikesCount = $commentaire->getDislikesCount();
+
+        // Renvoyer les données mises à jour
+        return new JsonResponse([
+            'message' => 'Like ajouté avec succès.',
+            'updatedLikeCount' => $updatedLikesCount,
+            'updatedDislikeCount' => $updatedDislikesCount
+        ], Response::HTTP_CREATED);
     }
 
     // Supprimer un like ou dislike d'un commentaire
@@ -164,4 +173,3 @@ class LikesCommentaireController extends AbstractController
         return new JsonResponse($response, Response::HTTP_OK);
     }
 }
-

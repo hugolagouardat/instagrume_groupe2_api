@@ -73,7 +73,16 @@ class LikesPhotoController extends AbstractController
         $entityManager->persist($like);
         $entityManager->flush();
 
-        return new JsonResponse('Like ajouté avec succès.', Response::HTTP_CREATED);
+        // Récupérer les données mises à jour après l'ajout du like
+        $updatedLikesCount = $photo->getLikesCount();
+        $updatedDislikesCount = $photo->getDislikesCount();
+
+        // Renvoyer les données mises à jour
+        return new JsonResponse([
+            'message' => 'Like ajouté avec succès.',
+            'updatedLikeCount' => $updatedLikesCount,
+            'updatedDislikeCount' => $updatedDislikesCount
+        ], Response::HTTP_CREATED);
     }
 
 
