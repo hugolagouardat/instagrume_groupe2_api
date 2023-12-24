@@ -105,7 +105,7 @@ class PhotoController extends AbstractController
     }
 
     //Modifier une photo
-    #[Route('/api/photos', methods: ['PUT'])]
+    #[Route('/api/photos/{id}', methods: ['PUT'])]
     #[Security(name: null)]
     #[OA\Put(description: 'Modifier une photo avec son id')]
     #[OA\Response(
@@ -121,23 +121,17 @@ class PhotoController extends AbstractController
         content: new OA\JsonContent(
             type: 'object',
             properties: [
-                new OA\Property(property: 'id', type: 'int'),
+                new OA\Property(property: 'image', type: 'string'),
                 new OA\Property(property: 'description', type: 'string'),
 
             ]
         )
     )]
     #[OA\Tag(name: 'Photos')]
-    public function updatePhoto(Request $request, ManagerRegistry $doctrine)
+    public function updatePhoto(Request $request, ManagerRegistry $doctrine, $id)
     {
         $data = json_decode($request->getContent(), true);
 
-        // Vérifiez si les données contiennent l'ID et la description
-        if (!isset($data['id']) || !isset($data['description'])) {
-            return new JsonResponse('Les champs "id" et "description" sont obligatoires.', Response::HTTP_BAD_REQUEST);
-        }
-
-        $id = $data['id'];
         $entityManager = $doctrine->getManager();
         $photo = $entityManager->getRepository(Photo::class)->find($id);
 
@@ -146,8 +140,24 @@ class PhotoController extends AbstractController
             return new JsonResponse("La photo avec l'ID " . $id . " n'existe pas.", Response::HTTP_NOT_FOUND);
         }
 
-        // Mettre à jour la description
-        $photo->setDescription($data['description']);
+        if (isset($data['description'])) {
+            $photo->setDescription($data['description']);
+        } else {
+            $photo->setDescription(null);
+        }
+
+        if (isset($data['image'])) {
+            // Gestion de l'image en Base64
+            $imageBase64 = $data['image'];
+            $image = base64_decode($imageBase64);
+            $imageName = uniqid() . '.png';
+            file_put_contents(__DIR__ . '/../../public/images/photos/' . $imageName, $image);
+
+            // Enregistrement du nom de fichier dans l'utilisateur
+            $photo->setImage($imageName);
+        } 
+
+        $entityManager->persist($photo);
         $entityManager->flush();
 
         $serializer = new Serializer([new ObjectNormalizer()], [new JsonEncoder()]);
@@ -173,7 +183,8 @@ class PhotoController extends AbstractController
                     new OA\Property(property: 'description', type: 'string'),
                     new OA\Property(property: 'user_id', type: 'int'),
                     new OA\Property(property: 'is_locked', type: 'boolean')
-                ])
+                ]
+            )
         )
     )]
     #[OA\Response(
