@@ -181,8 +181,7 @@ class PhotoController extends AbstractController
                 properties: [
                     new OA\Property(property: 'image', type: 'string'),
                     new OA\Property(property: 'description', type: 'string'),
-                    new OA\Property(property: 'user_id', type: 'int'),
-                    new OA\Property(property: 'is_locked', type: 'boolean')
+                    new OA\Property(property: 'user_id', type: 'int')
                 ]
             )
         )
@@ -205,18 +204,24 @@ class PhotoController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        // Vérifiez si les données sont valides
-        if (!isset($data['image']) || !isset($data['description'])) {
-            return new JsonResponse('Les champs "image" et "description" sont obligatoire.', Response::HTTP_BAD_REQUEST);
+        // Vérifiez si l'image est valide
+        if (!isset($data['image'])) {
+            return new JsonResponse('Le champs "image" est obligatoire.', Response::HTTP_BAD_REQUEST);
         }
 
         $entityManager = $doctrine->getManager();
 
         // Créez une nouvelle instance de l'entité Photo
         $photo = new Photo();
-        $photo->setDescription($data['description']);
+
+        if (isset($data['description'])) {
+            $photo->setDescription($data['description']);
+        } else {
+            $photo->setDescription(null);
+        }
         $photo->setDislikesCount(0);
         $photo->setLikesCount(0);
+        $photo->setIsLocked(false);
 
         $date = new DateTime();
         $photo->setDatePoste($date);
@@ -228,13 +233,7 @@ class PhotoController extends AbstractController
         file_put_contents(__DIR__ . '/../../public/images/photos/' . $imageName, $image);
 
         // Enregistrement du nom de fichier dans l'utilisateur
-        $photo->setImage($data['image']);
-
-        if (isset($data['is_locked'])) {
-            $photo->setIsLocked($data['is_locked']);
-        } else {
-            $photo->setIsLocked(false);
-        }
+        $photo->setImage($imageName);
 
         $user = $entityManager->getRepository(User::class)->find($data['user_id']);
 

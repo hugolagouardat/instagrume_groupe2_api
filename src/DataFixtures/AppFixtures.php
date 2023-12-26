@@ -150,6 +150,7 @@ class AppFixtures extends Fixture
         $commentaire2->setDislikesCount(5);
         $commentaire2->setUser($userCom2);
         $commentaire2->setPhoto($photo1);
+        $commentaire2->setCommentaireParent($commentaire1);
         $manager->persist($commentaire2);
         $manager->flush();
 
@@ -179,6 +180,20 @@ class AppFixtures extends Fixture
         $commentaire4->setUser($userCom4);
         $commentaire4->setPhoto($photo4);
         $manager->persist($commentaire4);
+        $manager->flush();
+
+        //Commentaire 2
+        $dateCom5 = DateTime::createFromFormat('Y-m-d H:i:s', '2023-11-18 11:20:00');
+        $userCom5 = $manager->getRepository(User::class)->findOneBy(['username' => 'standard']);
+
+        $commentaire5 = new Commentaire();
+        $commentaire5->setDescription("Original !");
+        $commentaire5->setDateCommentaire($dateCom5);
+        $commentaire5->setLikesCount(0);
+        $commentaire5->setDislikesCount(0);
+        $commentaire5->setUser($userCom5);
+        $commentaire5->setPhoto($photo1);
+        $manager->persist($commentaire5);
         $manager->flush();
 
 
