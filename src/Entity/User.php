@@ -12,7 +12,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 use OpenApi\Attributes as OA;
 
-
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
