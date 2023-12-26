@@ -90,14 +90,13 @@ class CommentaireController extends AbstractController
     }
 
     // Modifier un commentaire
-    #[Route('/api/commentaires', methods: ['PUT'])]
+    #[Route('/api/commentaires/{commentId}', methods: ['PUT'])]
     #[OA\Put(
         description: 'Modifier un commentaire',
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
                 properties: [
-                    new OA\Property(property: 'commentaireId', type: 'integer'),
                     new OA\Property(property: 'description', type: 'string')
                 ]
             )
@@ -114,16 +113,15 @@ class CommentaireController extends AbstractController
         ]
     )]
     #[OA\Tag(name: 'Commentaire')]
-    public function updateCommentaire(Request $request, ManagerRegistry $doctrine): JsonResponse
+    public function updateCommentaire(Request $request, ManagerRegistry $doctrine, $commentId): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        $commentaireId = $data['commentaireId'];
 
         $entityManager = $doctrine->getManager();
-        $commentaire = $entityManager->getRepository(Commentaire::class)->find($commentaireId);
+        $commentaire = $entityManager->getRepository(Commentaire::class)->find($commentId);
 
         if (!$commentaire) {
-            return new JsonResponse("Le commentaire avec l'ID " . $commentaireId . " n'existe pas.", Response::HTTP_NOT_FOUND);
+            return new JsonResponse("Le commentaire avec l'ID " . $commentId . " n'existe pas.", Response::HTTP_NOT_FOUND);
         }
 
         $commentaire->setDescription($data['description']);
