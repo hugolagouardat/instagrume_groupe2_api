@@ -158,7 +158,7 @@ class UserController extends AbstractController
     // erreur inconu voir la doc
 
 
-    #[Route('/api/users', methods: ['PUT'])]
+    #[Route('/api/users/{userId}', methods: ['PUT'])]
     #[OA\Put(description: 'Update un nouvel utilisateur')]
     #[OA\Response(
         response: 200,
@@ -170,28 +170,46 @@ class UserController extends AbstractController
         content: new OA\JsonContent(
             type: 'object',
             properties: [
-                new OA\Property(property: 'id', type: 'number'),
-                new OA\Property(property: 'password', type: 'string'),
                 new OA\Property(property: 'avatar', type: 'string'),
                 new OA\Property(property: 'description', type: 'string'),
+                new OA\Property(property: 'password', type: 'string')               
             ]
         )
     )]
     #[OA\Tag(name: 'utilisateurs')]
-    public function updateUser(ManagerRegistry $doctrine)
+    public function updateUser(ManagerRegistry $doctrine, $userId)
     {
         $entityManager = $doctrine->getManager();
         $request = Request::createFromGlobals();
         $data = json_decode($request->getContent(), true);
-        $user = $doctrine->getRepository(User::class)->find($data['id']);
+        $user = $doctrine->getRepository(User::class)->find($userId);
         if (!$user) {
             throw $this->createNotFoundException(
                 "Pas d'utilisateur"
             );
         }
-        $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
-        $user->setAvatar($data['avatar']);
-        $user->setDescription($data['description']);
+
+        if (isset($data['avatar'])) {
+            // Gestion de l'image en Base64
+            $imageBase64 = $data['avatar'];
+            $image = base64_decode($imageBase64);
+            $imageName = uniqid() . '.png';
+            file_put_contents(__DIR__ . '/../../public/images/avatar/' . $imageName, $image);
+
+            // Enregistrement du nom de fichier dans l'utilisateur
+            $user->setAvatar($imageName);
+        }
+        
+        if (isset($data['description'])) {
+            $user->setDescription($data['description']);
+        } else {
+            $user->setDescription(null);
+        }
+
+        if (isset($data['password'])) {
+            $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
+        } 
+
         $entityManager->persist($user);
         $entityManager->flush();
 
