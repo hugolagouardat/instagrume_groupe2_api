@@ -123,6 +123,7 @@ class PhotoController extends AbstractController
             properties: [
                 new OA\Property(property: 'image', type: 'string'),
                 new OA\Property(property: 'description', type: 'string'),
+                new OA\Property(property: 'is_locked', type: 'boolean'),
 
             ]
         )
@@ -144,6 +145,10 @@ class PhotoController extends AbstractController
             $photo->setDescription($data['description']);
         } else {
             $photo->setDescription(null);
+        }
+
+        if (isset($data['is_locked'])) {
+            $photo->setIsLocked($data['is_locked']);
         }
 
         if (isset($data['image'])) {

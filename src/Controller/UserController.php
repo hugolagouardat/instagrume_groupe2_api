@@ -172,7 +172,8 @@ class UserController extends AbstractController
             properties: [
                 new OA\Property(property: 'avatar', type: 'string'),
                 new OA\Property(property: 'description', type: 'string'),
-                new OA\Property(property: 'password', type: 'string')               
+                new OA\Property(property: 'password', type: 'string'),
+                new OA\Property(property: 'ban', type: 'boolean')               
             ]
         )
     )]
@@ -209,6 +210,10 @@ class UserController extends AbstractController
         if (isset($data['password'])) {
             $user->setPassword($this->passwordHasher->hashPassword($user, $data['password']));
         } 
+
+        if (isset($data['ban'])) {
+            $user->setBan($data['ban']);
+        }
 
         $entityManager->persist($user);
         $entityManager->flush();
