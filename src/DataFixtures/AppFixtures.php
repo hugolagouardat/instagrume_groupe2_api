@@ -39,7 +39,7 @@ class AppFixtures extends Fixture
         $user2->setUsername('standard');
         $user2->setRoles(["ROLE_USER"]);
         $user2->setPassword($this->passwordHasher->hashPassword($user2, 'standard'));
-        $user2->setAvatar("BB99.png");
+        $user2->setAvatar("default.png");
         $user2->setDescription("Juliette, 25 ans, Marseille");
         $user2->setBan(true);
         $manager->persist($user2);
@@ -49,7 +49,7 @@ class AppFixtures extends Fixture
         $user3->setUsername('lambda');
         $user3->setRoles(["ROLE_USER"]);
         $user3->setPassword($this->passwordHasher->hashPassword($user3, 'lambda'));
-        $user3->setAvatar("chevaml.jpeg");
+        $user3->setAvatar("cheval.jpeg");
         $user3->setDescription("Moi c'est Anthonio et j'adore les fruits et légumes");
         $user3->setBan(false);
         $manager->persist($user3);
@@ -71,10 +71,10 @@ class AppFixtures extends Fixture
         $userPhoto1 = $manager->getRepository(User::class)->findOneBy(['username' => 'admin']);
 
         $photo1 = new Photo();
-        $photo1->setImage("BB99.png");
+        $photo1->setImage("cocktail.png");
         $photo1->setDatePoste($datePhoto1);
-        $photo1->setLikesCount(40);
-        $photo1->setDislikesCount(10);
+        $photo1->setLikesCount(2);
+        $photo1->setDislikesCount(1);
         $photo1->setIsLocked(false);
         $photo1->setUser($userPhoto1);
         $manager->persist($photo1);
@@ -84,11 +84,11 @@ class AppFixtures extends Fixture
         $datePhoto3 = DateTime::createFromFormat('Y-m-d H:i:s', '2023-04-01 08:30:00');
 
         $photo2 = new Photo();
-        $photo2->setImage("chevaml.jpeg");
-        $photo2->setDescription("Qu'il y a t'il de plus beau que cette poire ?");
+        $photo2->setImage("fruit.png");
+        $photo2->setDescription("Voici les magnifiques fruits achetés ce matin au marché.");
         $photo2->setDatePoste($datePhoto3);
-        $photo2->setLikesCount(4000);
-        $photo2->setDislikesCount(1000);
+        $photo2->setLikesCount(1);
+        $photo2->setDislikesCount(1);
         $photo2->setIsLocked(false);
         $photo2->setUser($userPhoto1);
         $manager->persist($photo2);
@@ -99,11 +99,11 @@ class AppFixtures extends Fixture
         $userPhoto2 = $manager->getRepository(User::class)->findOneBy(['username' => 'standard']);
 
         $photo3 = new Photo();
-        $photo3->setImage("chien.png");
-        $photo3->setDescription("Voici une belle pomme que j'ai acheté ce matin au marché");
+        $photo3->setImage("orange.png");
+        $photo3->setDescription("Mon premier fruit de l'année !");
         $photo3->setDatePoste($datePhoto2);
-        $photo3->setLikesCount(1200);
-        $photo3->setDislikesCount(400);
+        $photo3->setLikesCount(1);
+        $photo3->setDislikesCount(0);
         $photo3->setIsLocked(true);
         $photo3->setUser($userPhoto2);
         $manager->persist($photo3);
@@ -114,11 +114,11 @@ class AppFixtures extends Fixture
         $userPhoto3 = $manager->getRepository(User::class)->findOneBy(['username' => 'lambda']);
 
         $photo4 = new Photo();
-        $photo4->setImage("horse.jpg");
+        $photo4->setImage("plat.png");
         $photo4->setDescription("Très joli plat que j'ai cuisiné ce matin");
         $photo4->setDatePoste($datePhoto4);
-        $photo4->setLikesCount(100);
-        $photo4->setDislikesCount(350);
+        $photo4->setLikesCount(0);
+        $photo4->setDislikesCount(0);
         $photo4->setIsLocked(false);
         $photo4->setUser($userPhoto3);
         $manager->persist($photo4);
@@ -130,10 +130,10 @@ class AppFixtures extends Fixture
         $userCom1 = $manager->getRepository(User::class)->findOneBy(['username' => 'lambda']);
 
         $commentaire1 = new Commentaire();
-        $commentaire1->setDescription("Quelle jolie photo");
+        $commentaire1->setDescription("Quel jolis cocktails !");
         $commentaire1->setDateCommentaire($dateCom1);
-        $commentaire1->setLikesCount(122);
-        $commentaire1->setDislikesCount(35);
+        $commentaire1->setLikesCount(2);
+        $commentaire1->setDislikesCount(1);
         $commentaire1->setUser($userCom1);
         $commentaire1->setPhoto($photo1);
         $manager->persist($commentaire1);
@@ -146,8 +146,8 @@ class AppFixtures extends Fixture
         $commentaire2 = new Commentaire();
         $commentaire2->setDescription("Oui, très beau");
         $commentaire2->setDateCommentaire($dateCom2);
-        $commentaire2->setLikesCount(10);
-        $commentaire2->setDislikesCount(5);
+        $commentaire2->setLikesCount(1);
+        $commentaire2->setDislikesCount(1);
         $commentaire2->setUser($userCom2);
         $commentaire2->setPhoto($photo1);
         $commentaire2->setCommentaireParent($commentaire1);
@@ -159,10 +159,10 @@ class AppFixtures extends Fixture
         $userCom3 = $manager->getRepository(User::class)->findOneBy(['username' => 'admin']);
 
         $commentaire3 = new Commentaire();
-        $commentaire3->setDescription("Quelles sont belles !");
+        $commentaire3->setDescription("Trop génial !");
         $commentaire3->setDateCommentaire($dateCom3);
-        $commentaire3->setLikesCount(155);
-        $commentaire3->setDislikesCount(100);
+        $commentaire3->setLikesCount(1);
+        $commentaire3->setDislikesCount(0);
         $commentaire3->setUser($userCom3);
         $commentaire3->setPhoto($photo3);
         $manager->persist($commentaire3);
@@ -175,14 +175,14 @@ class AppFixtures extends Fixture
         $commentaire4 = new Commentaire();
         $commentaire4->setDescription("Miam !");
         $commentaire4->setDateCommentaire($dateCom4);
-        $commentaire4->setLikesCount(155);
-        $commentaire4->setDislikesCount(100);
+        $commentaire4->setLikesCount(0);
+        $commentaire4->setDislikesCount(0);
         $commentaire4->setUser($userCom4);
         $commentaire4->setPhoto($photo4);
         $manager->persist($commentaire4);
         $manager->flush();
 
-        //Commentaire 2
+        //Commentaire 5
         $dateCom5 = DateTime::createFromFormat('Y-m-d H:i:s', '2023-11-18 11:20:00');
         $userCom5 = $manager->getRepository(User::class)->findOneBy(['username' => 'standard']);
 
@@ -194,6 +194,20 @@ class AppFixtures extends Fixture
         $commentaire5->setUser($userCom5);
         $commentaire5->setPhoto($photo1);
         $manager->persist($commentaire5);
+        $manager->flush();
+
+        //Commentaire 6
+        $dateCom6 = DateTime::createFromFormat('Y-m-d H:i:s', '2023-11-18 17:30:10');
+        $userCom6 = $manager->getRepository(User::class)->findOneBy(['username' => 'modo']);
+
+        $commentaire6 = new Commentaire();
+        $commentaire6->setDescription("Tu ne vas pas prendre un kilo avec ce plat !");
+        $commentaire6->setDateCommentaire($dateCom6);
+        $commentaire6->setLikesCount(0);
+        $commentaire6->setDislikesCount(0);
+        $commentaire6->setUser($userCom6);
+        $commentaire6->setPhoto($photo4);
+        $manager->persist($commentaire6);
         $manager->flush();
 
 
